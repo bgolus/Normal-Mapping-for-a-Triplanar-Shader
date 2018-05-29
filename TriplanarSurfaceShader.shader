@@ -109,7 +109,7 @@ Shader "Triplanar/Surface Shader (RNM)" {
             half occX = tex2D(_OcclusionMap, uvX).g;
             half occY = tex2D(_OcclusionMap, uvY).g;
             half occZ = tex2D(_OcclusionMap, uvZ).g;
-            half occ = LerpOneTo(colX * triblend.x + colY * triblend.y + colZ * triblend.z, _OcclusionStrength);
+            half occ = LerpOneTo(occX * triblend.x + occY * triblend.y + occZ * triblend.z, _OcclusionStrength);
 
             // tangent space normal maps
             half3 tnormalX = UnpackNormal(tex2D(_BumpMap, uvX));
