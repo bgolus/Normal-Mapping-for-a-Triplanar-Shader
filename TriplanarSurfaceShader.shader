@@ -79,9 +79,9 @@ Shader "Triplanar/Surface Shader (RNM)" {
 
             // calculate triplanar uvs
             // applying texture scale and offset values ala TRANSFORM_TEX macro
-            float2 uvX = IN.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zy;
-            float2 uvY = IN.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zy;
-            float2 uvZ = IN.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zy;
+            float2 uvX = IN.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zw;
+            float2 uvY = IN.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zw;
+            float2 uvZ = IN.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 
             // offset UVs to prevent obvious mirroring
         #if defined(TRIPLANAR_UV_OFFSET)

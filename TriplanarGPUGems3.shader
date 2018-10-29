@@ -70,9 +70,9 @@ Shader "Triplanar/GPU Gems 3"
 
                 // calculate triplanar uvs
                 // applying texture scale and offset values ala TRANSFORM_TEX macro
-                float2 uvX = i.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zy;
-                float2 uvY = i.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zy;
-                float2 uvZ = i.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zy;
+                float2 uvX = i.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvY = i.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zw;
+                float2 uvZ = i.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 
                 // offset UVs to prevent obvious mirroring
             #if defined(TRIPLANAR_UV_OFFSET)
