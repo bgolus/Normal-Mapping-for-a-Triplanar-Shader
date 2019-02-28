@@ -1,10 +1,8 @@
-﻿// Normal Mapping for a Triplanar Shader - Ben Golus 2017
+// Normal Mapping for a Triplanar Shader - Ben Golus 2017
 // Unity Surface Shader example shader
 
 // Implements correct triplanar normals in a Surface Shader with out computing or passing additional information from the
-// vertex shader. Instead works around some oddities with how Surface Shaders handle the tangent space vectors. Attempting
-// to directly access the tangent matrix data results in a shader generation error. This works around the issue by tricking
-// the surface shader into not using those vectors until actually in the generated shader code.
+// vertex shader.
 
 Shader "Triplanar/Surface Shader (RNM)" {
     Properties {
@@ -34,13 +32,6 @@ Shader "Triplanar/Surface Shader (RNM)" {
         // offset UVs to prevent obvious mirroring
         // #define TRIPLANAR_UV_OFFSET
 
-        // hack to work around the way Unity passes the tangent to world matrix to surface shaders to prevent compiler errors
-        #if defined(INTERNAL_DATA) && (defined(UNITY_PASS_FORWARDBASE) || defined(UNITY_PASS_FORWARDADD) || defined(UNITY_PASS_DEFERRED) || defined(UNITY_PASS_META))
-            #define WorldToTangentNormalVector(data,normal) mul(normal, half3x3(data.internalSurfaceTtoW0, data.internalSurfaceTtoW1, data.internalSurfaceTtoW2))
-        #else
-            #define WorldToTangentNormalVector(data,normal) normal
-        #endif
-
         // Reoriented Normal Mapping
         // http://blog.selfshadow.com/publications/blending-in-detail/
         // Altered to take normals (-1 to 1 ranges) rather than unsigned normal maps (0 to 1 ranges)
@@ -69,6 +60,14 @@ Shader "Triplanar/Surface Shader (RNM)" {
             INTERNAL_DATA
         };
 
+        float3 WorldToTangentNormalVector(Input IN, float3 normal) {
+            float3 t2w0 = WorldNormalVector(IN, float3(1,0,0));
+            float3 t2w1 = WorldNormalVector(IN, float3(0,1,0));
+            float3 t2w2 = WorldNormalVector(IN, float3(0,0,1));
+            float3x3 t2w = float3x3(t2w0, t2w1, t2w2);
+            return normalize(mul(t2w, normal));
+        }
+
         void surf (Input IN, inout SurfaceOutputStandard o) {
             // work around bug where IN.worldNormal is always (0,0,0)!
             IN.worldNormal = WorldNormalVector(IN, float3(0,0,1));
@@ -79,9 +78,9 @@ Shader "Triplanar/Surface Shader (RNM)" {
 
             // calculate triplanar uvs
             // applying texture scale and offset values ala TRANSFORM_TEX macro
-            float2 uvX = IN.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zw;
-            float2 uvY = IN.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zw;
-            float2 uvZ = IN.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zw;
+            float2 uvX = IN.worldPos.zy * _MainTex_ST.xy + _MainTex_ST.zy;
+            float2 uvY = IN.worldPos.xz * _MainTex_ST.xy + _MainTex_ST.zy;
+            float2 uvZ = IN.worldPos.xy * _MainTex_ST.xy + _MainTex_ST.zy;
 
             // offset UVs to prevent obvious mirroring
         #if defined(TRIPLANAR_UV_OFFSET)
